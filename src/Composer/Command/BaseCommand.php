@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of Composer.
@@ -61,7 +63,7 @@ abstract class BaseCommand extends Command
     {
         $application = parent::getApplication();
         if (!$application instanceof Application) {
-            throw new \RuntimeException('Composer commands can only work with an '.Application::class.' instance set');
+            throw new \RuntimeException('Composer commands can only work with an ' . Application::class . ' instance set');
         }
 
         return $application;
@@ -95,6 +97,8 @@ abstract class BaseCommand extends Command
      */
     public function requireComposer(?bool $disablePlugins = null, ?bool $disableScripts = null): Composer
     {
+        echo "\nReached 1\n";
+
         if (null === $this->composer) {
             $application = parent::getApplication();
             if ($application instanceof Application) {
@@ -102,8 +106,8 @@ abstract class BaseCommand extends Command
                 assert($this->composer instanceof Composer);
             } else {
                 throw new \RuntimeException(
-                    'Could not create a Composer\Composer instance, you must inject '.
-                    'one if this command is not used with a Composer\Console\Application instance'
+                    'Could not create a Composer\Composer instance, you must inject ' .
+                        'one if this command is not used with a Composer\Console\Application instance'
                 );
             }
         }
@@ -198,12 +202,14 @@ abstract class BaseCommand extends Command
     {
         $definition = $this->getDefinition();
         $name = (string) $input->getCompletionName();
-        if (CompletionInput::TYPE_OPTION_VALUE === $input->getCompletionType()
+        if (
+            CompletionInput::TYPE_OPTION_VALUE === $input->getCompletionType()
             && $definition->hasOption($name)
             && ($option = $definition->getOption($name)) instanceof InputOption
         ) {
             $option->complete($input, $suggestions);
-        } elseif (CompletionInput::TYPE_ARGUMENT_VALUE === $input->getCompletionType()
+        } elseif (
+            CompletionInput::TYPE_ARGUMENT_VALUE === $input->getCompletionType()
             && $definition->hasArgument($name)
             && ($argument = $definition->getArgument($name)) instanceof InputArgument
         ) {
@@ -282,7 +288,7 @@ abstract class BaseCommand extends Command
             if (0 === count($input->getOption('ignore-platform-req')) && is_string($ignorePlatformReqEnv) && '' !== $ignorePlatformReqEnv) {
                 $input->setOption('ignore-platform-req', explode(',', $ignorePlatformReqEnv));
 
-                $io->writeError('<warning>COMPOSER_IGNORE_PLATFORM_REQ is set to ignore '.$ignorePlatformReqEnv.'. You may experience unexpected errors.</warning>');
+                $io->writeError('<warning>COMPOSER_IGNORE_PLATFORM_REQ is set to ignore ' . $ignorePlatformReqEnv . '. You may experience unexpected errors.</warning>');
             }
         }
 
@@ -358,7 +364,7 @@ abstract class BaseCommand extends Command
                     $preferSource = false;
                     break;
                 default:
-                    throw new \UnexpectedValueException('--prefer-install accepts one of "dist", "source" or "auto", got '.$input->getOption('prefer-install'));
+                    throw new \UnexpectedValueException('--prefer-install accepts one of "dist", "source" or "auto", got ' . $input->getOption('prefer-install'));
             }
         }
 
@@ -399,7 +405,7 @@ abstract class BaseCommand extends Command
         $requirements = $this->normalizeRequirements($requirements);
         foreach ($requirements as $requirement) {
             if (!isset($requirement['version'])) {
-                throw new \UnexpectedValueException('Option '.$requirement['name'] .' is missing a version constraint, use e.g. '.$requirement['name'].':^1.0');
+                throw new \UnexpectedValueException('Option ' . $requirement['name'] . ' is missing a version constraint, use e.g. ' . $requirement['name'] . ':^1.0');
             }
             $requires[$requirement['name']] = $requirement['version'];
         }
@@ -456,12 +462,12 @@ abstract class BaseCommand extends Command
     protected function getAuditFormat(InputInterface $input, string $optName = 'audit-format'): string
     {
         if (!$input->hasOption($optName)) {
-            throw new \LogicException('This should not be called on a Command which has no '.$optName.' option defined.');
+            throw new \LogicException('This should not be called on a Command which has no ' . $optName . ' option defined.');
         }
 
         $val = $input->getOption($optName);
         if (!in_array($val, Auditor::FORMATS, true)) {
-            throw new \InvalidArgumentException('--'.$optName.' must be one of '.implode(', ', Auditor::FORMATS).'.');
+            throw new \InvalidArgumentException('--' . $optName . ' must be one of ' . implode(', ', Auditor::FORMATS) . '.');
         }
 
         return $val;

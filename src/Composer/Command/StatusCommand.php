@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of Composer.
@@ -54,12 +56,13 @@ been modified locally.
 
 Read more at https://getcomposer.org/doc/03-cli.md#status
 EOT
-            )
-        ;
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        echo "\nreached 11\n";
+
         $composer = $this->requireComposer();
 
         $commandEvent = new CommandEvent(PluginEvents::COMMAND, 'status', $input, $output);
@@ -97,6 +100,7 @@ EOT
 
         // list packages
         foreach ($installedRepo->getCanonicalPackages() as $package) {
+            echo "\nReached 2\n";
             $downloader = $dm->getDownloaderForPackage($package);
             $targetDir = $im->getInstallPath($package);
             if ($targetDir === null) {
@@ -104,6 +108,8 @@ EOT
             }
 
             if ($downloader instanceof ChangeReportInterface) {
+                echo "\nReached 3\n";
+
                 if (is_link($targetDir)) {
                     $errors[$targetDir] = $targetDir . ' is a symbolic link.';
                 }
@@ -115,6 +121,8 @@ EOT
 
             if ($downloader instanceof VcsCapableDownloaderInterface) {
                 if ($downloader->getVcsReference($package, $targetDir)) {
+                    echo "\nReached 4\n";
+
                     switch ($package->getInstallationSource()) {
                         case 'source':
                             $previousRef = $package->getSourceReference();
@@ -129,6 +137,8 @@ EOT
                     $currentVersion = $guesser->guessVersion($dumper->dump($package), $targetDir);
 
                     if ($previousRef && $currentVersion && $currentVersion['commit'] !== $previousRef && $currentVersion['pretty_version'] !== $previousRef) {
+                        echo "\nreached 5 - TODO\n";
+
                         $vcsVersionChanges[$targetDir] = [
                             'previous' => [
                                 'version' => $package->getPrettyVersion(),
@@ -152,12 +162,17 @@ EOT
 
         // output errors/warnings
         if (!$errors && !$unpushedChanges && !$vcsVersionChanges) {
+            echo "\nreached 6\n";
+
+
             $io->writeError('<info>No local changes</info>');
 
             return 0;
         }
 
         if ($errors) {
+            echo "\nreached 7\n";
+
             $io->writeError('<error>You have changes in the following dependencies:</error>');
 
             foreach ($errors as $path => $changes) {
@@ -165,7 +180,7 @@ EOT
                     $indentedChanges = implode("\n", array_map(static function ($line): string {
                         return '    ' . ltrim($line);
                     }, explode("\n", $changes)));
-                    $io->write('<info>'.$path.'</info>:');
+                    $io->write('<info>' . $path . '</info>:');
                     $io->write($indentedChanges);
                 } else {
                     $io->write($path);
@@ -174,6 +189,8 @@ EOT
         }
 
         if ($unpushedChanges) {
+            echo "\nreached 8 - TODO\n";
+
             $io->writeError('<warning>You have unpushed changes on the current branch in the following dependencies:</warning>');
 
             foreach ($unpushedChanges as $path => $changes) {
@@ -181,7 +198,7 @@ EOT
                     $indentedChanges = implode("\n", array_map(static function ($line): string {
                         return '    ' . ltrim($line);
                     }, explode("\n", $changes)));
-                    $io->write('<info>'.$path.'</info>:');
+                    $io->write('<info>' . $path . '</info>:');
                     $io->write($indentedChanges);
                 } else {
                     $io->write($path);
@@ -190,6 +207,8 @@ EOT
         }
 
         if ($vcsVersionChanges) {
+            echo "\nreached 9 - TODO\n";
+
             $io->writeError('<warning>You have version variations in the following dependencies:</warning>');
 
             foreach ($vcsVersionChanges as $path => $changes) {
@@ -204,7 +223,7 @@ EOT
                         $previousVersion .= sprintf(' (%s)', $changes['previous']['ref']);
                     }
 
-                    $io->write('<info>'.$path.'</info>:');
+                    $io->write('<info>' . $path . '</info>:');
                     $io->write(sprintf('    From <comment>%s</comment> to <comment>%s</comment>', $previousVersion, $currentVersion));
                 } else {
                     $io->write($path);
@@ -213,6 +232,8 @@ EOT
         }
 
         if (($errors || $unpushedChanges || $vcsVersionChanges) && !$input->getOption('verbose')) {
+            echo "\nreached 10\n";
+
             $io->writeError('Use --verbose (-v) to see a list of files');
         }
 
