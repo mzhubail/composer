@@ -263,4 +263,56 @@ Using version 1.1.0 for required/pkg
 OUTPUT
         ];
     }
+
+    public function testInconsistentRequireKeys()
+    {
+        echo "\n\n>> Entered Beginning\n";
+        $isDev = false;
+
+        $dir = $this->initTempComposer([
+            'repositories' => [
+                'packages' => [
+                    'type' => 'package',
+                    'package' => [
+                        ['name' => 'required/pkg', 'version' => '1.0.0'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $package = self::getPackage('required/pkg');
+        // $package->setType('metapackage');
+
+        $this->createComposerLock([$package], []);
+        $this->createInstalledJson([$package], []);
+        // $this->createComposerLock(
+        //     $isDev ? [] : [$package],
+        //     $isDev ? [$package] : []
+        // );
+        // $this->createInstalledJson(
+        //     $isDev ? [] : [$package],
+        //     $isDev ? [$package] : []
+        // );
+
+        readfile($dir . '/composer.json');
+        echo PHP_EOL;
+        readfile($dir . '/composer.lock');
+
+        $appTester = $this->getApplicationTester();
+        $appTester->run([
+            'command' => 'require',
+            '--dry-run' => true,
+            '--no-audit' => true,
+            '--dev' => true,
+            // '--no-dev' => true,
+            '--no-install' => true,
+            '--no-interaction' => true,
+            'packages' => ['required/pkg']
+        ]);
+
+        self::assertSame(
+            '',
+            $appTester->getDisplay(true)
+        );
+    }
 }
