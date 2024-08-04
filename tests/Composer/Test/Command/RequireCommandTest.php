@@ -304,7 +304,6 @@ OUTPUT
         $appTester = $this->getApplicationTester();
         $appTester->run([
             'command' => 'require',
-            '--dry-run' => true,
             '--no-audit' => true,
             '--dev' => true,
             // '--no-dev' => true,
@@ -313,9 +312,20 @@ OUTPUT
             'packages' => ['required/pkg']
         ]);
 
-        self::assertSame(
-            '',
-            $appTester->getDisplay(true)
+        self::assertStringContainsString(
+            '<warning>required/pkg is currently present in the require key and you ran the command with the --dev flag, which will move it to the require-dev key.</warning>',
+            $appTester->getDisplay(true),
+        );
+
+        $composer_content = (new JsonFile($dir . '/composer.json'))->read();
+
+        self::assertArrayHasKey(
+            "require-dev",
+            $composer_content,
+        );
+        self::assertArrayNotHasKey(
+            "require",
+            $composer_content,
         );
     }
 }
