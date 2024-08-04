@@ -318,7 +318,7 @@ EOT
             }
 
             if ($io->isInteractive()) {
-                echo "\nreached 27 - TODO\n";
+                echo "\nreached 27\n";
 
                 if (!$io->askConfirmation(sprintf('<info>Do you want to move %s?</info> [<comment>no</comment>]? ', count($inconsistentRequireKeys) > 1 ? 'these requirements' : 'this requirement'), false)) {
                     if (!$io->askConfirmation(sprintf('<info>Do you want to re-run the command %s --dev?</info> [<comment>yes</comment>]? ', $input->getOption('dev') ? 'without' : 'with'), true)) {
