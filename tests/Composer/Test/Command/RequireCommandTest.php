@@ -278,6 +278,9 @@ OUTPUT
                     ],
                 ],
             ],
+            "require" => [
+                "required/pkg" => "^1.0",
+            ],
         ]);
 
         $package = self::getPackage('required/pkg');
