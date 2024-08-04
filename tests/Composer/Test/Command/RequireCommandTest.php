@@ -264,10 +264,16 @@ OUTPUT
         ];
     }
 
-    public function testInconsistentRequireKeys()
+    /**
+     * @dataProvider provideInconsistentRequireKeys
+     * @param bool $isDev
+     * @param bool $isInteractive
+     * @param string $expectedWarning
+     */
+    public function testInconsistentRequireKeys(bool $isDev, bool $isInteractive, string $expectedWarning): void
     {
-        echo "\n\n>> Entered Beginning\n";
-        $isDev = false;
+        $currentKey = $isDev ? "require" : "require-dev";
+        $otherKey = $isDev ? "require-dev" : "require";
 
         $dir = $this->initTempComposer([
             'repositories' => [
@@ -278,54 +284,52 @@ OUTPUT
                     ],
                 ],
             ],
-            "require" => [
+            $currentKey => [
                 "required/pkg" => "^1.0",
             ],
         ]);
 
         $package = self::getPackage('required/pkg');
-        // $package->setType('metapackage');
-
-        $this->createComposerLock([$package], []);
-        $this->createInstalledJson([$package], []);
-        // $this->createComposerLock(
-        //     $isDev ? [] : [$package],
-        //     $isDev ? [$package] : []
-        // );
-        // $this->createInstalledJson(
-        //     $isDev ? [] : [$package],
-        //     $isDev ? [$package] : []
-        // );
-
-        readfile($dir . '/composer.json');
-        echo PHP_EOL;
-        readfile($dir . '/composer.lock');
+        if ($isDev) {
+            $this->createComposerLock([], [$package]);
+            $this->createInstalledJson([], [$package]);
+        } else {
+            $this->createComposerLock([$package], []);
+            $this->createInstalledJson([$package], []);
+        }
 
         $appTester = $this->getApplicationTester();
         $appTester->run([
             'command' => 'require',
             '--no-audit' => true,
-            '--dev' => true,
-            // '--no-dev' => true,
+            '--dev' => $isDev,
             '--no-install' => true,
             '--no-interaction' => true,
             'packages' => ['required/pkg']
         ]);
 
         self::assertStringContainsString(
-            '<warning>required/pkg is currently present in the require key and you ran the command with the --dev flag, which will move it to the require-dev key.</warning>',
+            $expectedWarning,
             $appTester->getDisplay(true),
         );
 
         $composer_content = (new JsonFile($dir . '/composer.json'))->read();
+        self::assertArrayHasKey($otherKey, $composer_content);
+        self::assertArrayNotHasKey($currentKey, $composer_content);
+    }
 
-        self::assertArrayHasKey(
-            "require-dev",
-            $composer_content,
-        );
-        self::assertArrayNotHasKey(
-            "require",
-            $composer_content,
-        );
+    public function provideInconsistentRequireKeys(): \Generator
+    {
+        yield [
+            true,
+            false,
+            '<warning>required/pkg is currently present in the require key and you ran the command with the --dev flag, which will move it to the require-dev key.</warning>'
+        ];
+
+        yield [
+            false,
+            false,
+            '<warning>required/pkg is currently present in the require-dev key and you ran the command without the --dev flag, which will move it to the require key.</warning>'
+        ];
     }
 }
