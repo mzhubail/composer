@@ -306,7 +306,7 @@ EOT
 
         if (count($inconsistentRequireKeys) > 0) {
             foreach ($inconsistentRequireKeys as $package) {
-                echo "\nreached 26 - TODO\n";
+                echo "\nreached 26\n";
 
                 $io->warning(sprintf(
                     '%s is currently present in the %s key and you ran the command %s the --dev flag, which will move it to the %s key.',
@@ -591,11 +591,11 @@ EOT
         }
 
         if (!$dryRun) {
-            echo "\nreached 39 - TODO\n";
+            echo "\nreached 39\n";
 
             $this->updateFile($this->json, $requirements, $requireKey, $removeKey, $sortPackages);
             if ($locker->isLocked()) {
-                echo "\nreached 40 - TODO\n";
+                echo "\nreached 40\n";
 
                 $contents = file_get_contents($this->json->getPath());
                 if (false === $contents) {
@@ -603,7 +603,7 @@ EOT
                 }
                 $lockFile = Factory::getLockFile($this->json->getPath());
                 if (file_exists($lockFile)) {
-                    echo "\nreached 41 - TODO\n";
+                    echo "\nreached 41\n";
 
                     $lockMtime = filemtime($lockFile);
                     $lock = new JsonFile($lockFile);
@@ -646,7 +646,7 @@ EOT
      */
     private function updateFileCleanly(JsonFile $json, array $new, string $requireKey, string $removeKey, bool $sortPackages): bool
     {
-        echo "\nreached 43 - TODO\n";
+        echo "\nreached 43\n";
 
         $contents = file_get_contents($json->getPath());
 
